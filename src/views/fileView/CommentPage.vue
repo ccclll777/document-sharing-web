@@ -118,12 +118,12 @@ export default {
                 "page": this.currentPage - 1,
                 "rows": this.pageSize,
             }
-            CommentRequest.getListData(params).then(response => {
-                if (response.code === 200) {
-                    this.comments = response.data.comments;
-                    this.totalItems = response.data.totalNum;
-                }
-            })
+            // CommentRequest.getListData(params).then(response => {
+            //     if (response.code === 200) {
+            //         this.comments = response.data.comments;
+            //         this.totalItems = response.data.totalNum;
+            //     }
+            // })
         },
         postComment() {
             if (this.inputValue === "" || this.docId === "") {

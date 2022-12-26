@@ -1,23 +1,30 @@
 <template>
-    <div>
-        <div class="main-container">
+        <div >
             <div class="title-info">
-                <div class="doc-trim" style="text-align: center">
-                    <img :src=" thumbId | imgSrc " alt="thumb"
-                         style="width: 36px;max-height: 48px;border: 1px solid #dcdee2; border-radius: 2px">
-                </div>
-                <div class="doc-info">
-                    <div class="doc-info-title">
-                        {{ title }}
-                    </div>
-                    <div class="doc-info-tag">
-                      <el-tag type="success" v-for="item in tags" :index="item.index" >{{ item.name }}</el-tag>
-                    </div>
-                    <div class="doc-info-detail">
-                        {{ userName }} {{ createTime }}
-                    </div>
+              <el-row>
+                <el-col :span="2"> <div class="doc-trim" style="text-align: center">
+                  <img :src=" thumbId | imgSrc " alt="thumb"
+                       style="width: 108px;max-height: 144px;border: 1px solid #dcdee2; border-radius: 2px">
+                </div></el-col>
+                <el-col :span="22">
+                  <div class="doc-info">
+                  <div class="doc-info-title">
+                    {{ name }}
+                  </div>
+                  <div class="doc-info-tag">
+                    <!--                      <el-tag type="success" v-for="item in tags" :index="item.index" >{{ item.name }}</el-tag>-->
+                    <el-tag v-for="tagName in tags" :key="tagName" style="margin-left: 5px" type="success">
+                      {{ tagName }}
+                    </el-tag>
+                  </div>
+                  <div class="doc-info-detail">
+                    {{ userName }} {{ createTime }}
+                  </div>
 
-                </div>
+                </div></el-col>
+              </el-row>
+
+
             </div>
             <div class="doc-preview">
                 <!--                <PdfView></PdfView>-->
@@ -32,24 +39,24 @@
             </div>
 
         </div>
-    </div>
-
 </template>
 
 <script>
 // import PdfView from "./PngView"
 // import { BackendUrl } from '@/api/request'
 // import DocRequest from "@/api/document"
+import {searchFileDetail} from "@/api/files";
 // import {parseTime} from "../../utils/index"
 
 import DocOperation from "./docOperation"
 
 import CommentPage from "./CommentPage"
-
+import {parseTime} from "@/utils";
 export default {
     data() {
         return {
-            title: "",
+            id: this.$route.params.id,
+          name: "",
             userName: "",
             docId: "",
             tags: [],
@@ -70,58 +77,51 @@ export default {
             if (value === "" || value == null) {
                 return require('@/assets/source/doc.png');
             } else {
-                return  "http://localhost:18082/files/image2/" + value;
+                return  "http://localhost:18082/api/files/image/" + value;
             }
         }
     },
     methods: {
         init() {
-            // let docId = this.$route.query.docId;
-            // var params = {
-            //     docId: docId
-            // }
-            // DocRequest.getData(params).then(response => {
-            //     if (response.code == 200) {
-            //         this.title = response.data.title;
-            //         this.userName = response.data.userName;
-            //         this.thumbId = response.data.thumbId;
-            //         var docTime = response.data.createTime;
-            //         this.createTime = parseTime(new Date(docTime), '{y}年{m}月{d}日 {h}:{i}:{s}');
-            //
-            //         let tagList = response.data['tagVOList'];
-            //         this.tags = this.renderTags(tagList);
-            //
-            //         let title = response.data.title
-            //         let suffix = title.split(".")[title.split('.').length - 1];
-            //         switch (suffix) {
-            //             case 'pdf':
-            //                 this.component = () => import('@/views/preview/index2')
-            //                 break
-            //             case 'png':
-            //             case 'jpg':
-            //             case 'jpeg':
-            //                 this.component = () => import('@/views/preview/PngView')
-            //                 break
-            //             case 'html':
-            //             case 'txt':
-            //                 this.component = () => import('@/views/preview/HtmlView')
-            //                 break
-            //             case 'docx':
-            //             case 'doc':
-            //                 this.component = () => import('@/views/preview/WordView3')
-            //                 break
-            //             case 'pptx':
-            //                 this.component = () => import('@/views/preview/PPTxView')
-            //                 break
-            //             case 'xlsx':
-            //                 this.component = () => import('@/views/preview/excel')
-            //                 break
-            //             default:
-            //                 this.component = () => import('@/views/preview/ErrorView')
-            //                 break
-            //         }
-            //     }
-            // })
+          searchFileDetail(this.id).then(response => {
+             if (response.code === 200) {
+               this.name = response.data.name;
+               this.userName = response.data.userName;
+               this.thumbId = response.data.thumbId;
+               var docTime = response.data.createTime;
+               this.createTime = parseTime(new Date(docTime), '{y}年{m}月{d}日 {h}:{i}:{s}');
+               this.tags = response.data['tagNames'];
+               let name = response.data.name
+               let suffix = name.split(".")[name.split('.').length - 1];
+               switch (suffix) {
+                 case 'pdf':
+                   this.component = () => import('@/views/fileView/pdfView')
+                   break
+                 case 'png':
+                 case 'jpg':
+                 case 'jpeg':
+                   this.component = () => import('@/views/fileView/PngView')
+                   break
+                 case 'html':
+                 case 'txt':
+                   this.component = () => import('@/views/fileView/HtmlView')
+                   break
+                 case 'docx':
+                 case 'doc':
+                   this.component = () => import('@/views/fileView/WordView')
+                   break
+                 case 'pptx':
+                   this.component = () => import('@/views/fileView/PPTxView')
+                   break
+                 case 'xlsx':
+                   this.component = () => import('@/views/fileView/excel')
+                   break
+                 default:
+                   this.component = () => import('@/views/fileView/ErrorView')
+                   break
+               }
+             }
+          })
         },
 
         renderTags(tags) {
@@ -145,29 +145,29 @@ export default {
     //left: 0;
     //top: 0;
 }
-
 .main-container {
-    width: 1200px;
+    width: 900px;
     //height: 100vh;
     //background-color: yellowgreen;
     padding: 25px;
-    margin: auto;
+    margin-left: 40px;
     box-sizing: content-box;
 
     .title-info {
-        height: 185px;
-        width: 1200px;
+        height: 190px;
+        width:auto;
         box-shadow: 0px 0px 5px 0px rgba(64, 64, 64, 0.3000);
         border-radius: 8px;
         background-color: #fffeff;
         padding: 36px;
         display: block;
+      margin: 40px;
 
         .doc-trim {
             float: left;
             width: 40px;
             //background-color: lightblue;
-            height: 40px;
+            height: 60px;
             line-height: 40px;
             display: block;
         }
@@ -178,6 +178,7 @@ export default {
             float: left;
             padding: 0 10px;
             text-align: left;
+            margin-left: 40px;
 
             .doc-info-title {
                 font-size: 24px;
@@ -193,6 +194,7 @@ export default {
             }
 
             .doc-info-tag {
+              margin-top: 10px;
                 height: 40px;
                 line-height: 40px;
                 display: flex;
@@ -201,6 +203,8 @@ export default {
             }
 
             .doc-info-detail {
+              margin-top: 20px;
+              margin-left: 10px;
                 height: 40px;
                 font-size: 14px;
                 font-family: PingFangSC-Regular, PingFang SC;
@@ -213,7 +217,7 @@ export default {
     }
 
     .doc-preview {
-        margin: 20px 0;
+        margin: 40px ;
         overflow-y: auto;
         height: 100vh;
         padding: 10px 0;
@@ -223,6 +227,7 @@ export default {
     }
 
     .doc-operation-body {
+      margin: 40px ;
         height: 200px;
         //line-height: 200px;
         text-align: center;
@@ -232,8 +237,7 @@ export default {
     }
 
     .doc-comment {
-
-        margin: 20px 0;
+      margin: 40px ;
 
         background-color: #42b983;
         min-height: 120px;

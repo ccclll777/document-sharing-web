@@ -2,7 +2,9 @@
     <div class="word-wrap">
         <div v-show="view_flag" style="padding: 400px; color: #ffcc4f;">
             <div class="demo-spin-icon-load">
-                <Icon type="md-refresh" style="font-size: 48px;"/>
+              <i class="el-icon-refresh" style="font-size: 48px;"></i>
+
+<!--              <Icon type="md-refresh" style="font-size: 48px;"/>-->
             </div>
             <div style='font-size:16px'>加载中...</div>
         </div>
@@ -21,7 +23,6 @@
 <script>
 
 // docx文档预览(只能转换.docx文档，转换过程中复杂样式被忽，居中、首行缩进等)
-import mammoth from "mammoth";
 import axios from 'axios'
 
 export default {
@@ -35,7 +36,6 @@ export default {
             execlArraybufferData: null, //Excelblob转换为arraybuff数据
             sheetNames: null, //从数据中获取到的sheet页数组
             result: '',
-
             view_flag: true,
 
         };
@@ -49,7 +49,7 @@ export default {
 
             let docId = this.$route.query.docId;
 
-            let wordURL = 'http://81.69.247.172:8082/files/view/' + docId
+            let wordURL = 'http://81.69.247.172:8082/api/files/view/' + docId
 
             axios({
                 method: 'get',
@@ -128,40 +128,6 @@ export default {
                     }
                 }
             }
-        },
-
-        // 废弃
-        getWordText() {
-            const xhr = new XMLHttpRequest();
-            let docId = this.$route.query.docId;
-
-            this.wordURL = 'http://81.69.247.172:8082/files/view/' + docId
-
-            xhr.open("get", this.wordURL, true);
-            // xhr.responseType = "arraybuffer";
-            // xhr.onload = () => {
-            //     if (xhr.status == 200) {
-            //         console.log(xhr)
-            //         mammoth.convertToHtml({ arrayBuffer: new Uint8Array(xhr.response) }).then((resultObject) => {
-            //             this.$nextTick(() => {
-            //                 this.wordText = resultObject.value;
-            //             });
-            //         });
-            //     }
-            // };
-
-            xhr.responseType = "arraybuffer";
-            xhr.onload = () => {
-                if (xhr.status == 200) {
-                    console.log(xhr)
-                    mammoth.convertToHtml({arrayBuffer: xhr.response}).then((resultObject) => {
-                        this.$nextTick(() => {
-                            this.wordText = resultObject.value;
-                        });
-                    });
-                }
-            };
-            xhr.send();
         }
     }
 }

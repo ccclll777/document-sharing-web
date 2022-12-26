@@ -67,3 +67,10 @@ export function searchFileHint(word) {
         params: { keyWord: word }
     })
 }
+export function searchFileDetail(id) {
+    return request({
+        url: '/files/detail',
+        method: 'get',
+        params: { mongoFileId: id }
+    })
+}

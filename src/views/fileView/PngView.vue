@@ -8,14 +8,12 @@
 <script>
 
 // docx文档预览(只能转换.docx文档，转换过程中复杂样式被忽，居中、首行缩进等)
-import mammoth from "mammoth";
-import { BackendUrl } from '@/api/request'
 
 export default {
     name: "WordView",
     data() {
         return {
-            wordURL: BackendUrl() + '/files/view/' + this.$route.query.docId
+            wordURL: 'http://localhost:18082/api/files/view/' + this.$route.params.id
         };
     },
     created() {
@@ -23,10 +21,9 @@ export default {
     },
     methods: {
         getWordText() {
-            const xhr = new XMLHttpRequest();
-            let docId = this.$route.query.docId;
-
-            this.wordURL = BackendUrl() + '/files/view/' + docId
+            // const xhr = new XMLHttpRequest();
+            let docId = this.$route.params.id
+            this.wordURL = 'http://localhost:18082/files/view/' + docId
 
         }
     }
