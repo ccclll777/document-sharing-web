@@ -14,7 +14,6 @@
 <script>
 import { Navbar, Sidebar, AppMain } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
-import {adminAddBlog} from "@/api/admin";
 
 export default {
   name: 'Layout',

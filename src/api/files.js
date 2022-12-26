@@ -50,3 +50,20 @@ export function getUserFileList(page, size) {
         params: { pageNum: page, pageSize: size }
     })
 }
+
+// 搜索
+export function searchFileList(word) {
+    return request({
+        url: '/files/search',
+        method: 'get',
+        params: { keyWord: word }
+    })
+}
+
+export function searchFileHint(word) {
+    return request({
+        url: '/files/hint',
+        method: 'get',
+        params: { keyWord: word }
+    })
+}

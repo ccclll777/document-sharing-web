@@ -1,7 +1,7 @@
 <template>
   <el-card class="blog-item">
-    <div class="title" @click="openBlog" v-html="title" />
-    <div class="text" v-html="text" />
+    <div class="title" @click="openFile" v-html="name" />
+    <div class="text" v-html="description" />
   </el-card>
 </template>
 
@@ -9,21 +9,21 @@
 export default {
   props: {
     id: {
-      type: Number,
-      default: 0
-    },
-    title: {
       type: String,
       default: ''
     },
-    text: {
+    name: {
+      type: String,
+      default: ''
+    },
+    description: {
       type: String,
       default: ''
     }
   },
   methods: {
-    openBlog() {
-      this.$router.push({ path: '/detail/blog/' + this.id })
+    openFile() {
+      this.$router.push({ path: '/detail/file/' + this.id })
     }
   }
 }

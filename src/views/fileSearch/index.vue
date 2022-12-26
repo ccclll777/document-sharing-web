@@ -3,12 +3,19 @@
     <el-col :span="12" style="margin-left: 25%">
       <div style="margin: 8px">
         <el-row>
-          <el-autocomplete v-model="search" :fetch-suggestions="querySearch" placeholder="请输入搜索内容" :trigger-on-focus="false" style="width: 100%">
+          <el-autocomplete v-model="keyWord" :fetch-suggestions="querySearch" placeholder="请输入搜索内容" :trigger-on-focus="false" style="width: 100%">
             <el-button slot="append" icon="el-icon-search" @click="routeToSearch" />
           </el-autocomplete>
         </el-row>
-        <div v-for="(item,index) in list" :key="index">
-          <search-item :id="item.id" :title="item.title" :text="item.verbalContent" />
+
+        <div class="page-container" v-show="list.length > 0 ">
+          <div v-for="(item,index) in list" :key="index">
+            <search-item :id="item.mongoFileId" :name="item.name" :description="item.description" />
+          </div>
+        </div>
+        <div style="padding: 30px 10px; color: #555" v-show="list.length < 1">
+          <span v-if="!loading">暂无内容，试试其他呢～</span>
+          <span v-else>拼命查找中，请等待...</span>
         </div>
       </div>
     </el-col>
@@ -17,48 +24,49 @@
 
 <script>
 import SearchItem from '@/views/components/search-item'
-import { searchArticleList, searchAutoComplete } from '@/api/blog'
+import {searchFileList,searchFileHint} from "@/api/files";
 export default {
   components: { SearchItem },
   data() {
     return {
-      search: '',
-      list: []
+      keyWord: '',
+      list: [],
+      loading: true,
     }
   },
   watch: {
     '$route'(to, from) {
       if (to.query.word !== from.query.word && to.query.word !== null && to.query.word !== undefined) {
-        this.search = to.query.word
+        this.keyWord = to.query.word
         this.searchList()
       }
     }
   },
   created() {
     if (this.$route.query.word !== null && this.$route.query.word !== undefined) {
-      this.search = this.$route.query.word
+      this.keyWord = this.$route.query.word
       this.searchList()
     }
   },
   methods: {
     routeToSearch() {
-      this.$router.push({ path: '/blog/search?word=' + this.search })
+      this.$router.push({ path: '/blog/search?word=' + this.keyWord })
     },
     searchList() {
-      var that = this
-      searchArticleList(that.search).then(response => {
+      searchFileList(this.keyWord).then(response => {
+        this.loading = false;
         const { data } = response
-        that.list = data
-        for (var i in that.list) {
-          that.list[i].title = that.list[i].title.replace(/<javayh>/g, '<span style="color: #B71C1C">')
-          that.list[i].title = that.list[i].title.replace(/<\/javayh>/g, '</span>')
-          that.list[i].verbalContent = that.list[i].verbalContent.replace(/<javayh>/g, '<span style="color: #B71C1C">')
-          that.list[i].verbalContent = that.list[i].verbalContent.replace(/<\/javayh>/g, '</span>')
+        this.list = data
+        for (var i in this.list) {
+          // this.list[i].title = this.list[i].title.replace(/<javayh>/g, '<span style="color: #B71C1C">')
+          // this.list[i].title = this.list[i].title.replace(/<\/javayh>/g, '</span>')
+          this.list[i].description = this.list[i].description.replace(/<em>/g, '<span style="color: #B71C1C">')
+          this.list[i].description = this.list[i].description.replace(/<\/em>/g, '</span>')
         }
       })
     },
     querySearch(queryString, callback) {
-      searchAutoComplete(queryString).then(response => {
+      searchFileHint(queryString).then(response => {
         const { data } = response
         var suggestList = []
         for (var i in data) {

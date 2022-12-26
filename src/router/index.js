@@ -47,18 +47,17 @@ export const constantRoutes = [
     component: () => import('@/views/errorPage/404'),
     hidden: true
   },
-
-  // {
-  //   path: '/detail/blog/:id',
-  //   component: Layout,
-  //   children: [{
-  //     path: '',
-  //     name: 'BlogView',
-  //     component: () => import('@/views/blogView/index'),
-  //     meta: { title: '博客正文', icon: 'blog' },
-  //     hidden: true
-  //   }]
-  // },
+  {
+    path: '/detail/file/:id',
+    component: Layout,
+    children: [{
+      path: '',
+      name: 'FileView',
+      component: () => import('@/views/fileView/index'),
+      meta: { title: '文档详情', icon: 'blog' },
+      hidden: true
+    }]
+  },
   // {
   //   path: '/detail/:type/:id',
   //   component: Layout,
@@ -146,7 +145,7 @@ export const constantRoutes = [
     children: [
       {
         path: '',
-        component: () => import('@/views/blogSearch/index'),
+        component: () => import('@/views/fileSearch/index'),
         name: 'Blog5',
         meta: { title: '文档搜索', icon: 'search' }
       }
