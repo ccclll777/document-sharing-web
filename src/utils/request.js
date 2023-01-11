@@ -4,7 +4,7 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 const BASE_URL =  'http://localhost:18082/api'
 export function getBaseUrl() {
-  return BASE_URL
+  return 'http://localhost:18082/api'
 }
 
 // 设置请求的地址
@@ -75,4 +75,5 @@ service.interceptors.response.use(
 
 export default service
 // export default BASE_URL
+
 

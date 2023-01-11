@@ -22,6 +22,8 @@
 
 <script>
 import {getToken} from "@/utils/auth";
+import {getBaseUrl} from "@/utils/request";
+
 let PDFJS = require('pdfjs-dist');
 PDFJS.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.entry.js");
 export default {
@@ -67,7 +69,7 @@ export default {
             let docId = this.id
 
             //加载本地
-          this.pdf_src = 'http://localhost:18082/api/files/view/' + docId
+          this.pdf_src = getBaseUrl() + '/files/view/' + docId
             this._loadFile(this.pdf_src)
 
         },

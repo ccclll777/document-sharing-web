@@ -72,7 +72,7 @@
             style="margin-top: 30px; margin-bottom: 30px "
             class="upload-demo"
             drag
-            action="http://localhost:18082/api/files/upload"
+            :action="actionUrl"
             :before-upload="beforeUpload"
             multiple
             :headers="headerObj"
@@ -101,8 +101,9 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-import {getUploadUrl} from "@/api/files";
+import {getBaseUrl} from "@/utils/request";
 import { getToken } from '@/utils/auth'
+import {logout} from "@/api/user";
 export default {
   components: {
     Breadcrumb,
@@ -117,6 +118,7 @@ export default {
       headerObj: {
         Authorization: getToken()
       },
+      actionUrl: getBaseUrl() + "/files/upload",
 
     }
   },
@@ -129,7 +131,6 @@ export default {
   },
   methods: {
     beforeUpload(){
-      this.uploadURL = getUploadUrl()
     },
     uploadFile() {
         if(this.headerObj.Authorization === undefined) {
@@ -159,6 +160,12 @@ export default {
     },
     async logout() {
       await this.$store.dispatch('user/logout')
+
+      logout().then(response => {
+        console.log(response.data)
+      }).catch(error => {
+        console.log(error)
+      })
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     },
     routeToSearch() {

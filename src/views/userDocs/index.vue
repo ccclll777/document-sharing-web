@@ -10,9 +10,9 @@
       highlight-current-row
     >
       <el-table-column align="center" label="id" width="50%" sortable prop="id" />
-      <el-table-column align="center" label="文档名称" prop="name" width="200%" />
+      <el-table-column align="center" label="文档名称" prop="name" width="400%" />
       <el-table-column align="center" label="后缀" prop="suffix" width="100%"/>
-      <el-table-column align="center" label="文档大小" prop="size"   width="80%"/>
+      <el-table-column align="center" label="文档大小" prop="size"   width="120%"/>
 <!--      <el-table-column align="center" label="文档分类" prop="categoryName" />-->
       <el-table-column prop="categoryName" align="center" label="文档分类"  width="100%">
         <template slot-scope="scope">
@@ -34,11 +34,12 @@
         </template>
       </el-table-column>
       <el-table-column align="center" label="审查状态" prop="reviewState"/>
-      <el-table-column align="center" label="选项" width="150%">
+      <el-table-column align="center" label="选项" width="200%">
         <template slot-scope="scope">
           <el-button-group>
             <el-button type="primary" size="mini" icon="el-icon-edit" @click="edit(scope.row)" />
             <el-button type="danger" size="mini" icon="el-icon-delete" @click="del(scope.row)" />
+            <el-button type="primary" size="mini" icon="el-icon-download" @click="download(scope.row)" />
           </el-button-group>
         </template>
       </el-table-column>
@@ -49,6 +50,7 @@
 
 <script>
 import {getUserFileCount, getUserFileList, deleteFile} from "@/api/files";
+import {getBaseUrl} from "@/utils/request";
 
 export default {
   data() {
@@ -101,15 +103,19 @@ export default {
         this.confirmDel()
       })
     },
-    confirmEdit() {
-      var that = this
-      adminUpdateBlog(that.fileInfo.id, that.fileInfo).then(response => {
-        that.dialogFormVisible = false
-        that.handleCurrentChange()
-      }).catch(error => {
-        console.log(error)
-      })
+    download(res) {
+      console.log("download",getBaseUrl())
+      window.open(getBaseUrl() + "/files/view/" + res.mongoFileId, "_blank");
     },
+    // confirmEdit() {
+    //   var that = this
+    //   adminUpdateBlog(that.fileInfo.id, that.fileInfo).then(response => {
+    //     that.dialogFormVisible = false
+    //     that.handleCurrentChange()
+    //   }).catch(error => {
+    //     console.log(error)
+    //   })
+    // },
     confirmDel() {
       deleteFile(this.fileInfo.id).then(response => {
         if (response.code === 200) {

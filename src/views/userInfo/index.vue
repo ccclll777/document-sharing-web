@@ -75,8 +75,7 @@ export default {
       })
     },
     updateInfo() {
-      this.userInfo
-      const params = {id:this.userInfo.id,userName:this.userInfo.userName,nickName:this.userInfo.nickName,phone:this.userInfo.phone,email:this.userInfo.email}
+      const params = {id:this.userInfo.id,nickName:this.userInfo.nickName,phone:this.userInfo.phone,email:this.userInfo.email}
       updateUserInfo(params).then(response => {
         console.log(response.data)
         this.fetchInfo()

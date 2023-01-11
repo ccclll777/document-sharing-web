@@ -34,22 +34,18 @@
             <div class="doc-operation-body">
                 <doc-operation/>
             </div>
-            <div class="doc-comment">
-                <comment-page/>
-            </div>
+<!--            <div class="doc-comment">-->
+<!--                <comment-page/>-->
+<!--            </div>-->
 
         </div>
 </template>
 
 <script>
-// import PdfView from "./PngView"
-// import { BackendUrl } from '@/api/request'
-// import DocRequest from "@/api/document"
 import {searchFileDetail} from "@/api/files";
-// import {parseTime} from "../../utils/index"
 
 import DocOperation from "./docOperation"
-
+import { getBaseUrl } from '@/utils/request'
 import CommentPage from "./CommentPage"
 import {parseTime} from "@/utils";
 export default {
@@ -77,7 +73,7 @@ export default {
             if (value === "" || value == null) {
                 return require('@/assets/source/doc.png');
             } else {
-                return  "http://localhost:18082/api/files/image/" + value;
+                return  getBaseUrl() +"/files/image/" + value;
             }
         }
     },

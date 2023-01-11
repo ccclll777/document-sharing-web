@@ -8,12 +8,13 @@
 <script>
 
 // docx文档预览(只能转换.docx文档，转换过程中复杂样式被忽，居中、首行缩进等)
+import {getBaseUrl} from "@/utils/request";
 
 export default {
     name: "WordView",
     data() {
         return {
-            wordURL: 'http://localhost:18082/api/files/view/' + this.$route.params.id
+            wordURL: getBaseUrl() + '/files/view/' + this.$route.params.id
         };
     },
     created() {
@@ -23,7 +24,7 @@ export default {
         getWordText() {
             // const xhr = new XMLHttpRequest();
             let docId = this.$route.params.id
-            this.wordURL = 'http://localhost:18082/files/view/' + docId
+            this.wordURL = getBaseUrl() + '/files/view/' + docId
 
         }
     }

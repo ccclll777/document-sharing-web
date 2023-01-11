@@ -15,6 +15,8 @@
 // import CollectRequest from '@/api/collect'
 // import { BackendUrl } from '@/api/request'
 
+import {getBaseUrl} from "@/utils/request";
+
 export default {
     name: "docOperation",
     data() {
@@ -36,15 +38,41 @@ export default {
                     index: "3"
                 },
             ],
-            docId: this.$route.query.docId,
+            fileId: this.$route.params.id,
         }
     },
     mounted() {
 
     },
     methods: {
-        operate(item) {
+      operate(item) {
+        if (item.index === "3") {
+          window.open(getBaseUrl() + "/files/view/" + this.fileId, "_blank");
+        } else if (item.index === "1" || item.index === "2") {
+
+          if (!localStorage.getItem('token')) {
+            this.$message.error('跳转到登录页面，请先登录！');
+            this.$router.push({
+              path: '/login',
+              query: {
+                userName: this.userName
+              }
+            })
+          }
+
+          let params = {
+            docId: this.docId
+          }
+          CollectRequest.postData(params).then(res => {
+            this.$Notice.info({
+              title: '通知信息',
+              desc: '收藏点赞成功！'
+            });
+          }).catch(res => {
+            console.log(res)
+          })
         }
+      }
     }
 }
 </script>

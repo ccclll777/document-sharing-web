@@ -15,13 +15,14 @@
 
 
 import axios from 'axios'
+import {getBaseUrl} from "@/utils/request";
 
 export default {
 
     name: "WordView",
     data() {
         return {
-            wordURL: 'http://localhost:18082/api/files/view/' + this.$route.params.id
+            wordURL: getBaseUrl() +"/files/view/" + this.$route.params.id
         };
     },
     created() {
@@ -32,7 +33,7 @@ export default {
             // const xhr = new XMLHttpRequest();
             let docId = this.$route.params.id;
 
-            let wordURL = 'http://localhost:18082/api/files/view/' + docId
+            let wordURL = getBaseUrl() + '/files/view/' + docId
 
             axios({
                 method: 'get',

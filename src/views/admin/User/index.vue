@@ -21,19 +21,42 @@
       style="text-align: center"
     >
       <el-table-column align="center" label="id" width="120%" sortable prop="id" />
-      <el-table-column align="center" label="用户名" width="150%" prop="name" />
+      <el-table-column align="center" label="用户名" width="150%" prop="userName" />
       <el-table-column align="center" label="用户角色" width="120%">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.role === 0" type="info">普通用户</el-tag>
-          <el-tag v-if="scope.row.role === 1" type="primary">管理员</el-tag>
+          <el-tag v-if="scope.row.role === 2" type="primary">普通用户</el-tag>
+          <el-tag v-if="scope.row.role === 4" type="primary">临时用户</el-tag>
+          <el-tag v-if="scope.row.role === 1" type="primary">超级管理员</el-tag>
+          <el-tag v-if="scope.row.role === 3" type="primary">管理员</el-tag>
+<!--          <el-tag  type="primary">{{scope.row.roleName}}</el-tag>-->
         </template>
       </el-table-column>
+      <el-table-column align="center" label="昵称" width="120%" prop="nickName" />
       <el-table-column align="center" label="邮箱" prop="email" />
-      <el-table-column align="center" label="手机" width="120%" prop="mobile" />
-      <el-table-column align="center" label="性别" width="120%" prop="sex" />
-      <el-table-column align="center" label="年龄" width="120%" prop="age" />
-      <el-table-column align="center" label="职业" width="120%" prop="job" />
-      <el-table-column align="center" label="学校" width="120%" prop="school" />
+      <el-table-column align="center" label="手机" width="120%" prop="phone" />
+      <el-table-column align="center" label="用户状态" width="120%">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 0" type="info">已删除</el-tag>
+          <el-tag v-if="scope.row.status === 1" type="primary">正常</el-tag>
+          <el-tag v-if="scope.row.status === 2" type="info">已禁用</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+          label="创建时间"
+          align="center"
+          width="189"
+      >
+
+        <template slot-scope="scope">{{ scope.row.CreatedAt }}</template>
+      </el-table-column>
+      <el-table-column
+          label="更新时间"
+          align="center"
+          width="189"
+      >
+
+        <template slot-scope="scope">{{ scope.row.UpdatedAt}}</template>
+      </el-table-column>
       <el-table-column align="center" label="选项" width="120%">
         <template slot-scope="scope">
           <el-button-group>
@@ -46,8 +69,8 @@
     <el-pagination :total="userCount" :current-page.sync="currentPage" background layout="prev, pager, next" style="float: right; margin: 8px" @current-change="handleCurrentChange" />
     <el-dialog :visible.sync="registerFormVisible" title="添加用户">
       <el-form label-width="80px" style="margin: 8px">
-        <el-form-item label="用户名"><el-input v-model="addUserInfo.username" placeholder="请输入用户名" /></el-form-item>
-        <el-form-item label="邮箱"><el-input v-model="addUserInfo.email" placeholder="请输入邮箱" /></el-form-item>
+        <el-form-item label="用户名"><el-input v-model="addUserInfo.userName" placeholder="请输入用户名" /></el-form-item>
+<!--        <el-form-item label="邮箱"><el-input v-model="addUserInfo.email" placeholder="请输入邮箱" /></el-form-item>-->
         <el-form-item label="密码"><el-input v-model="addUserInfo.password" type="password" placeholder="请输入密码" /></el-form-item>
         <el-form-item>
           <div style="float: right">
@@ -60,15 +83,22 @@
     <el-dialog :visible.sync="dialogFormVisible" title="编辑用户">
       <el-form v-model="userInfo" label-width="80px" style="margin: 8px">
         <el-form-item label="用户id" style="text-align: left">{{ userInfo.id }}</el-form-item>
-        <el-form-item label="用户名"><el-input v-model="userInfo.name" placeholder="请输入用户名：张三" /></el-form-item>
-        <el-form-item label="用户角色"><el-input v-model="userInfo.role" placeholder="用户角色：0-普通用户/1-管理员" /></el-form-item>
+        <el-form-item label="用户昵称" style="width: 500px"><el-input v-model="userInfo.nickName" placeholder="请输入昵称：张三" /></el-form-item>
+<!--        <el-form-item label="用户角色" style="width: 500px"><el-input v-model="userInfo.role" placeholder="用户角色：2-普通用户/3-管理员/" /></el-form-item>-->
+        <el-form-item label="用户角色" style="width: 500px;text-align: left">
+          <el-select v-model="optionRoleName" placeholder="请选择">
+          <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled">
+          </el-option>
+        </el-select></el-form-item>
         <!--<el-form-item label="密码"><el-input v-model="userInfo.password" placeholder="请输入密码" /></el-form-item>-->
-        <el-form-item label="邮箱"><el-input v-model="userInfo.email" placeholder="请输入邮箱：xx@xx.xx" /></el-form-item>
-        <el-form-item label="手机"><el-input v-model="userInfo.mobile" placeholder="请输入手机：13123456789" /></el-form-item>
-        <el-form-item label="性别"><el-input v-model="userInfo.sex" placeholder="请输入性别：男/女" /></el-form-item>
-        <el-form-item label="年龄"><el-input v-model="userInfo.age" placeholder="请输入年龄：20" /></el-form-item>
-        <el-form-item label="职业"><el-input v-model="userInfo.job" placeholder="请输入职业：程序员" /></el-form-item>
-        <el-form-item label="学校"><el-input v-model="userInfo.school" placeholder="请输入学校：如山东大学" /></el-form-item>
+        <el-form-item label="邮箱" style="width: 500px"><el-input v-model="userInfo.email" placeholder="请输入邮箱：xx@xx.xx" /></el-form-item>
+        <el-form-item label="手机" style="width: 500px"><el-input v-model="userInfo.mobile" placeholder="请输入手机：13123456789" /></el-form-item>
+
         <el-form-item>
           <div style="float: right">
             <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -82,7 +112,7 @@
 
 <script>
 import { register } from '@/api/user'
-import { adminDelUser, adminGetUserCount, adminGetUserLists, adminUpdateUserInfo } from '@/api/admin'
+import { getUserCount,getUserList,deleteUser,updateUserInfo,updateUserRole } from '@/api/user'
 
 export default {
   data() {
@@ -95,7 +125,20 @@ export default {
       userCount: 10,
       searchItem: '',
       addUserInfo: { name: '', email: '', password: '' },
-      userInfo: { id: 0, name: '', role: 0, email: '', mobile: '', sex: '', age: 0, job: '', school: '' }
+      userInfo: { id: 0, name: '', role: 0, email: '', phone: '' },
+      options: [{
+        value: '1',
+        label: '超级管理员',
+        disabled: true
+      }, {
+        value: '2',
+        label: '普通用户',
+
+      }, {
+        value: '3',
+        label: '管理者'
+      }],
+      optionRoleName:""
     }
   },
   created() {
@@ -103,15 +146,29 @@ export default {
   },
   methods: {
     handleCurrentChange() {
-      var that = this
-      that.listLoading = true
-      adminGetUserCount().then(response => {
+      this.listLoading = true
+      getUserCount().then(response => {
         const { data } = response
-        that.userCount = data
-        adminGetUserLists(that.currentPage, 10).then(response => {
+        this.userCount = data
+        getUserList(this.currentPage, 10).then(response => {
           const { data } = response
-          that.list = data
-          that.listLoading = false
+          this.list = data
+          for (var i = 0; i < this.list.length; i++) {
+            if (this.list[i].role === 1) {
+              this.list[i].roleName = "超级管理员"
+            } else if (this.list[i].role === 2) {
+              this.list[i].roleName = "普通用户"
+            }else if (this.list[i].role === 3) {
+              this.list[i].roleName = "管理者"
+            }else if (this.list[i].role === 4){
+              this.list[i].roleName = "临时用户"
+            }
+            var date = new Date(Date.parse(this.list[i].createTime))
+            this.list[i].CreatedAt = date.toLocaleString('chinese', { hour12: false })
+            var UpdateDate = new Date(Date.parse(this.list[i].updateTime))
+            this.list[i].UpdatedAt = UpdateDate.toLocaleString('chinese', { hour12: false })
+          }
+          this.listLoading = false
         })
       })
     },
@@ -119,17 +176,17 @@ export default {
       this.registerFormVisible = true
     },
     confirmAddUser() {
-      var that = this
-      register(that.addUserInfo).then(response => {
-        that.addUserInfo = { name: '', email: '', password: '' }
-        that.registerFormVisible = false
-        that.handleCurrentChange()
+      register(this.addUserInfo).then(response => {
+        this.addUserInfo = { userName: '', password: '' }
+        this.registerFormVisible = false
+        this.handleCurrentChange()
       }).catch(error => {
         console.log(error)
       })
     },
     edit(res) {
       this.dialogFormVisible = true
+      this.optionRoleName = "超级管理员"
       this.userInfo = res
     },
     del(res) {
@@ -143,21 +200,43 @@ export default {
       })
     },
     confirmEdit() {
-      var that = this
-      adminUpdateUserInfo(that.userInfo.id, that.userInfo).then(response => {
-        that.dialogFormVisible = false
-        that.handleCurrentChange()
+      const params = {id:this.userInfo.id,nickName:this.userInfo.nickName,phone:this.userInfo.phone,email:this.userInfo.email}
+      updateUserInfo(params).then(response => {
+        if (response.code === 200) {
+
+          if (this.userInfo.role !== this.optionRoleName) {
+            var params2 = {userId:this.userInfo.id, roleId:this.optionRoleName}
+            updateUserRole(params2).then(response2 => {
+              if  (response2.code === 200) {
+                this.handleCurrentChange()
+                this.$message.success("修改成功")
+                this.dialogFormVisible = false
+              } else {
+                this.$message.error("错误：" + response.message)
+              }
+            }).catch(error => {
+              console.log(error)
+            })
+          }
+        } else {
+          this.$message.error("错误：" + response.message)
+        }
       }).catch(error => {
         console.log(error)
       })
+
+      console.log(this.optionRoleName)
     },
     confirmDel() {
-      var that = this
-      adminDelUser(that.userInfo.id).then(response => {
-        that.dialogFormVisible = false
-        that.handleCurrentChange()
+      deleteUser(this.userInfo.id).then(response => {
+        if (response.code === 200) {
+          this.dialogFormVisible = false
+          this.handleCurrentChange()
+        } else {
+          this.$message.error("错误：" + response.message)
+        }
       }).catch(error => {
-        console.log(error)
+        this.$message.error("错误：" + error)
       })
     }
   }

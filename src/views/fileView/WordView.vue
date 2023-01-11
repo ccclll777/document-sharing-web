@@ -14,7 +14,7 @@
 <script>
 import axios from 'axios'
 const docx = require('docx-preview');
-
+import {getBaseUrl} from "@/utils/request";
 // 如果 docx-preview 版本比较新需要 es6 导出
 // import { renderAsync } from 'docx-preview'
 
@@ -30,7 +30,7 @@ export default {
         }
     },
     mounted(){
-        let wordURL ='http://localhost:18082/api/files/view/' + this.$route.params.id
+        let wordURL =getBaseUrl() + '/files/view/' + this.$route.params.id
         axios({
             method: 'get',
             responseType: 'blob', // 设置响应文件格式

@@ -9,7 +9,6 @@ export function login(data) {
 }
 
 export function getInfo(userId) {
-  console.log("userId",userId)
   return request({
     url: '/auth/info',
     method: 'get',
@@ -19,9 +18,28 @@ export function getInfo(userId) {
 
 export function register(data) {
   return request({
-    url: '/user/regist',
+    url: '/user/register',
     method: 'post',
     data
+  })
+}
+export function logout() {
+  return request({
+    url: '/auth/logout',
+    method: 'post'
+  })
+}
+export function getUserCount() {
+  return request({
+    url: '/user/count',
+    method: 'get'
+  })
+}
+export function getUserList(page, size) {
+  return request({
+    url: '/user/all',
+    method: 'get',
+    params: { pageNum: page, pageSize: size }
   })
 }
 
@@ -32,15 +50,23 @@ export function updateUserInfo(data) {
     data
   })
 }
-
-// 获取用户历史记录
-export function getUserHistoryList(page, size) {
+export function deleteUser(userId) {
   return request({
-    url: '/record/getBrowsingHistory',
-    method: 'get',
-    params: { page: page, size: size }
+    url: '/user/delete/' + userId,
+    method: 'delete'
   })
 }
+export function updateUserRole(data) {
+  return request({
+    url: '/user/updateUserRole',
+    method: 'post',
+    data
+  })
+}
+
+
+
+
 
 export function getDetailInfo() {
   return request({

@@ -74,3 +74,4 @@ export function searchFileDetail(id) {
         params: { mongoFileId: id }
     })
 }
+

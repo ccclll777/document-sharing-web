@@ -1,13 +1,13 @@
 <template>
   <el-row class="blog-item">
-    <div class="title" @click="openBlog">{{ title }}</div>
+    <div class="title" @click="openFile">{{ name }}</div>
   </el-row>
 </template>
 
 <script>
 export default {
   props: {
-    title: {
+    name: {
       type: String,
       default: ''
     },
@@ -17,8 +17,8 @@ export default {
     }
   },
   methods: {
-    openBlog() {
-      this.$router.push({ path: '/detail/blog/' + this.id })
+    openFile() {
+      this.$router.push({ path: '/detail/file/' + this.id })
     }
   }
 }
