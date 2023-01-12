@@ -221,7 +221,7 @@ export default {
     // 添加分类确定
     handleConfirmAdd() {
       this.addFormVisible = false
-      var params = { 'name': this.addForm.name, 'description': this.addForm.description,userId :localStorage.getItem("id")}
+      var params = { 'name': this.addForm.name, 'description': this.addForm.description}
       addCategory(params).then(response => {
         if (response.code === 200) {
           this.$message.success(response.data)

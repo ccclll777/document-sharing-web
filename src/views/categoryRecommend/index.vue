@@ -1,65 +1,62 @@
 <template>
   <div class="homepage">
     <div class="bottom-group">
-      <div class="left-panel">
         <div class="top-container">
           <div class="panel-title left-pane-title">
-            <span>全部文档</span>
+            <span>文档分类</span>
           </div>
           <div :class=" item.clicked ? 'tag-info' : 'tag-info-unchecked' "
-              v-for="item in data"
-              @click="changeToCurrentTag(item.name, item.tagId)">
+               v-for="item in categories"
+               @click="changeToCurrentTag(item.name, item.id)">
             <span>{{ item.name }}</span>
           </div>
         </div>
         <div class="file-thumb-1">
           <FileThumb class="file-thumb"
-                    :flag="false"
-                    :title="file.name"
-                    :fileId="file.thumbId"
-                    v-for="file in currentData.slice(0, 6)" :key="file.mongoFileId"
-                    @click.native="openFile(file.mongoFileId)"
+                     :flag="false"
+                     :title="file.name"
+                     :fileId="file.thumbId"
+                     v-for="file in currentData.slice(0, 9)" :key="file.mongoFileId"
+                     @click.native="openFile(file.mongoFileId)"
           ></FileThumb>
         </div>
         <div class="file-thumb-1 second-group">
           <FileThumb class="file-thumb"
-                    :flag="false"
-                    :title="file.name"
-                    :fileId="file.thumbId"
-                    v-for="file in currentData.slice(6, 12)" :key="file.mongoFileId"
-                    @click.native="openFile(file.mongoFileId)"
+                     :flag="false"
+                     :title="file.name"
+                     :fileId="file.thumbId"
+                     v-for="file in currentData.slice(10, 19)" :key="file.mongoFileId"
+                     @click.native="openFile(file.mongoFileId)"
           ></FileThumb>
         </div>
-      </div>
-      <div class="right-panel">
-        <div class="top-container">
-          <div class="panel-title"><span>热门文档 🔥</span></div>
-        </div>
-        <div class="hot-trend">
-          <HotTrend></HotTrend>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
-import HotTrend from '@/views/dashboard/HotTrend'
-import { getRecentFiles } from '@/api/statistics'
+
+import {getFileListByCategoryId, getRecentFiles} from '@/api/statistics'
 import FileThumb from "@/views/dashboard/FileThumb";
+import {getCategoryList} from "@/api/category";
 
 
 export default {
-  name: "dashboard",
+  name: "categoryRecommend",
   components: {
-    HotTrend,
     FileThumb,
   },
   data() {
     return {
       imgSrc: require("../../assets/source/banner.png"),
-      data: {},
-      currentData: []
+      data: [],
+      currentData: [],
+      categories:[
+        {
+          id: 17,
+          name:"默认分类",
+          clicked:true
+        }
+      ]
     }
   },
   created() {
@@ -67,11 +64,19 @@ export default {
   },
   methods: {
     init() {
-      getRecentFiles(1, 15).then(response => {
-        const { data } = response
-        this.data = data
-        this.changeToCurrentTag(this.data[0].name, this.data[0].tagId)
+      getCategoryList(1,1000).then(response => {
+        if (response.code === 200) {
+          this.categories = response.data
+          for (var i = 0; i < response.data.length; i++) {
+            this.categories[i].clicked = false;
+          }
+          this.categories[0].clicked = true;
+        } else {
+          this.$message.info("错误：" + response.message)
+        }
+
       })
+      this.changeToCurrentTag(this.categories[0].name,this.categories[0].id)
     },
 
     /**
@@ -79,14 +84,23 @@ export default {
      * @param name
      * @param tagId
      */
-    changeToCurrentTag(name, tagId) {
+    changeToCurrentTag(name, categoryId) {
       this.currentData = []
-      this.data.forEach(item => {
-        if (item.name === name && item.tagId === tagId) {
-          item.clicked = true
-          this.currentData = item.fileList
+      for (var i = 0; i < this.categories.length; i++) {
+        if (this.categories[i].name === name && this.categories[i].id === categoryId){
+          this.categories[i].clicked = true;
         } else {
-          item.clicked = false
+          this.categories[i].clicked = false;
+        }
+      }
+      if (categoryId === -1) {
+        categoryId = 17
+      }
+      getFileListByCategoryId(1,20,categoryId).then(response => {
+        if (response.code == 200) {
+          const { data } = response
+          this.currentData = data
+
         }
       })
     },

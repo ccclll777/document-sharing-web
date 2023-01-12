@@ -1,7 +1,7 @@
 <template>
     <div class="hot-trend">
         <div class="first-group"
-             @click="getDocView(top1.id)"
+             @click="openFile(top1.mongoFileId)"
         >
             <div class="doc-thumb">
                 <DocThumb :flag="true" :title="top1.name"></DocThumb>
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="second-group">
-            <div class="trend-item" v-for="(item, index) in hotTrend" :key="index" @click="getDocView(item.id)">
+            <div class="trend-item" v-for="(item, index) in hotTrend" :key="index" @click="openFile(item.mongoFileId)">
                 <div class="trend-num" :style="index | xxx">
                     {{ index + 2 }}
                 </div>
@@ -44,7 +44,7 @@
 
 <script>
 import DocThumb from '@/views/dashboard/FileThumb'
-
+import {getHotFiles, getRecentFiles} from "@/api/statistics";
 export default {
     name: "HotTrend.vue",
     components: {DocThumb},
@@ -85,61 +85,59 @@ export default {
     },
     methods: {
         init() {
-            let data = {
-                top1: {
-                    name: "5g零售行业应用白皮书-苏宁易购+尼尔森-202008.pdf",
-                    id: "631456fe15c5d23bfb1ea730",
-                    commentNum: 121,
-                    likeNum: 2332,
-                    collectNum: 324535
-                },
-                others: [{
-                    hit: 456,
-                    name: "好车购平台.pptx",
-                    id: "63136f528c86d1646ac411d0"
-                }, {
-                    hit: 12,
-                    name: "中国金融科技生态白皮书2021年.pdf",
-                    id: "63136f448c86d1646ac411ca"
-                }, {
-                    hit: 12,
-                    name: "工作条例.docx",
-                    id: "631315e69faed23bb3baf607"
-                }, {
-                    hit: 12,
-                    name: "中国领导者十年领导力图鉴.pdf",
-                    id: "630821f829905176a6cb4293"
-                }, {
-                    hit: 12,
-                    name: "金融数学专业白皮书.pdf",
-                    id: "62b9bc2c845f9a73b891bd1d"
-                }, {
-                    hit: 12,
-                    name: "金融学院-金融学专业电子白皮书.pdf",
-                    id: "62b9bc38845f9a73b891bd23"
-                }]
+            // let data = {
+            //     top1: {
+            //         name: "5g零售行业应用白皮书-苏宁易购+尼尔森-202008.pdf",
+            //         id: "631456fe15c5d23bfb1ea730",
+            //         commentNum: 121,
+            //         likeNum: 2332,
+            //         collectNum: 324535
+            //     },
+            //     others: [{
+            //         hit: 456,
+            //         name: "好车购平台.pptx",
+            //         id: "63136f528c86d1646ac411d0"
+            //     }, {
+            //         hit: 12,
+            //         name: "中国金融科技生态白皮书2021年.pdf",
+            //         id: "63136f448c86d1646ac411ca"
+            //     }, {
+            //         hit: 12,
+            //         name: "工作条例.docx",
+            //         id: "631315e69faed23bb3baf607"
+            //     }, {
+            //         hit: 12,
+            //         name: "中国领导者十年领导力图鉴.pdf",
+            //         id: "630821f829905176a6cb4293"
+            //     }, {
+            //         hit: 12,
+            //         name: "金融数学专业白皮书.pdf",
+            //         id: "62b9bc2c845f9a73b891bd1d"
+            //     }, {
+            //         hit: 12,
+            //         name: "金融学院-金融学专业电子白皮书.pdf",
+            //         id: "62b9bc38845f9a73b891bd23"
+            //     }]
+            // }
+          getHotFiles().then(response => {
+            if (response.code == 200) {
+              let data = response.data;
+              let topValue = data.top1 | null;
+              if (topValue != null) {
+                this.top1 = data.top1
+              }
+              let tempData;
+              if (data.others.length > 8) {
+                tempData = data.others.slice(0, 7)
+              } else {
+                tempData = data.others
+              }
+              if (tempData != null) {
+                this.hotTrend = tempData.sort(this.compare('hit'))
+              }
             }
+          })
 
-            // StatsRequest.getHotTrend().then(response => {
-            //     if (response.code == 200) {
-            //         data = response.data;
-            //         let topValue = data.top1 | null;
-            //         if (topValue != null) {
-            //             this.top1 = data.top1
-            //         }
-            //         let tempData;
-            //         if (data.others.length > 8) {
-            //             tempData = data.others.slice(0, 7)
-            //         } else {
-            //             tempData = data.others
-            //         }
-            //         if (tempData != null) {
-            //             this.hotTrend = tempData.sort(this.compare('hit'))
-            //         }
-            //     }
-            // }).catch(err => {
-            //     console.log(err)
-            // })
         },
         compare(property) {
             return function (a, b) {
@@ -148,15 +146,10 @@ export default {
                 return value1 - value2;
             }
         },
-        getDocView(id) {
-            this.$router.push({
-                path: '/preview',
-                query: {
-                    docId: id
-                }
-            })
+      openFile(id) {
+        this.$router.push({ path: '/detail/file/' + id })
 
-        }
+      }
     }
 
 }

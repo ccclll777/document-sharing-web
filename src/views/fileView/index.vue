@@ -7,21 +7,35 @@
                        style="width: 108px;max-height: 144px;border: 1px solid #dcdee2; border-radius: 2px">
                 </div></el-col>
                 <el-col :span="22">
-                  <div class="doc-info">
-                  <div class="doc-info-title">
-                    {{ name }}
-                  </div>
-                  <div class="doc-info-tag">
-                    <!--                      <el-tag type="success" v-for="item in tags" :index="item.index" >{{ item.name }}</el-tag>-->
-                    <el-tag v-for="tagName in tags" :key="tagName" style="margin-left: 5px" type="success">
-                      {{ tagName }}
-                    </el-tag>
-                  </div>
-                  <div class="doc-info-detail">
-                    {{ userName }} {{ createTime }}
-                  </div>
+                  <el-descriptions title="文档信息" class="doc-info">
+                    <el-descriptions-item label="文档名称"> {{ name }}</el-descriptions-item>
+                    <el-descriptions-item label="标签">
+                      <el-tag v-for="tagName in tags" :key="tagName" style="margin-left: 5px" type="success">
+                        {{ tagName }}
+                      </el-tag>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="上传用户">{{ userName }}</el-descriptions-item>
 
-                </div></el-col>
+                    <el-descriptions-item label="文档描述"> {{ description }}</el-descriptions-item>
+                  </el-descriptions>
+<!--                  <div class="doc-info">-->
+<!--                  <div class="doc-info-title">-->
+<!--                    {{ name }}-->
+<!--                  </div>-->
+<!--                  <div class="doc-info-tag">-->
+<!--                    <el-tag v-for="tagName in tags" :key="tagName" style="margin-left: 5px" type="success">-->
+<!--                      {{ tagName }}-->
+<!--                    </el-tag>-->
+<!--                    <div class="doc-info-title" style="margin-left: 10pt">-->
+<!--                      description: {{ description }}-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                  <div class="doc-info-detail">-->
+<!--                    {{ userName }} {{ createTime }}-->
+<!--                  </div>-->
+
+<!--                </div>-->
+          </el-col>
               </el-row>
 
 
@@ -84,6 +98,7 @@ export default {
                this.name = response.data.name;
                this.userName = response.data.userName;
                this.thumbId = response.data.thumbId;
+               this.description =  response.data.description;
                var docTime = response.data.createTime;
                this.createTime = parseTime(new Date(docTime), '{y}年{m}月{d}日 {h}:{i}:{s}');
                this.tags = response.data['tagNames'];

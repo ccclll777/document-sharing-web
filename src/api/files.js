@@ -75,3 +75,11 @@ export function searchFileDetail(id) {
     })
 }
 
+export function updateFile(data) {
+    return request({
+        url: '/files/update',
+        method: 'post',
+        data
+    })
+}
+

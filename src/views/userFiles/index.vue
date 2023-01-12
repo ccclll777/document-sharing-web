@@ -45,12 +45,39 @@
       </el-table-column>
     </el-table>
     <el-pagination :total="fileCount" :current-page.sync="currentPage" background layout="prev, pager, next" style="float: right; margin: 8px" @current-change="handleCurrentChange" />
+
+    <!-- 修改文档分类-->
+    <el-dialog title="修改文档分类" :visible.sync="dialogFormVisible">
+      <el-form :model="editForm">
+        <el-form-item label="文档名称" >
+          <el-input v-model="editForm.name" autocomplete="off" />
+        </el-form-item>
+          <el-select v-model="editForm.categoryId" clearable placeholder="请选择分类">
+            <el-option
+                v-for="item in categories"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        <el-form-item label="文档描述" >
+          <el-input v-model="editForm.description" autocomplete="off" />
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirmEdit">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
+
 </template>
 
 <script>
-import {getUserFileCount, getUserFileList, deleteFile} from "@/api/files";
+import {getUserFileCount, getUserFileList, deleteFile, updateFileCategory, updateFile} from "@/api/files";
 import {getBaseUrl} from "@/utils/request";
+import {getCategoryList} from "@/api/category";
 
 export default {
   data() {
@@ -61,13 +88,26 @@ export default {
       addFormVisible: false,
       currentPage: 1,
       fileCount: 10,
-      searchItem: ''
+      searchItem: '',
+      categories:[],
+      editForm :{}
     }
   },
   created() {
     this.handleCurrentChange()
+    this.categoryList()
   },
   methods: {
+    categoryList() {
+      getCategoryList(1,1000).then(response => {
+        if (response.code === 200) {
+          this.categories = response.data
+        } else {
+          this.$message.info("错误：" + response.message)
+        }
+
+      })
+    },
     handleCurrentChange() {
       this.listLoading = true
       getUserFileCount().then(response => {
@@ -91,7 +131,7 @@ export default {
     },
     edit(res) {
       this.dialogFormVisible = true
-      this.fileInfo = res
+      this.editForm = res
     },
     del(res) {
       this.fileInfo = res
@@ -107,15 +147,21 @@ export default {
       console.log("download",getBaseUrl())
       window.open(getBaseUrl() + "/files/view/" + res.mongoFileId, "_blank");
     },
-    // confirmEdit() {
-    //   var that = this
-    //   adminUpdateBlog(that.fileInfo.id, that.fileInfo).then(response => {
-    //     that.dialogFormVisible = false
-    //     that.handleCurrentChange()
-    //   }).catch(error => {
-    //     console.log(error)
-    //   })
-    // },
+    confirmEdit() {
+      console.log(this.editForm)
+      var params = {categoryId: this.editForm.categoryId,fileId : this.editForm.id,name:this.editForm.name, description:this.editForm.description}
+      updateFile(params).then(response => {
+            if (response.code === 200) {
+              this.dialogFormVisible = false
+              this.handleCurrentChange()
+              this.$message.success(response.data)
+            } else {
+              this.$message.error("错误：" + response.data)
+            }
+      }).catch(error => {
+        console.log(error)
+      })
+    },
     confirmDel() {
       deleteFile(this.fileInfo.id).then(response => {
         if (response.code === 200) {

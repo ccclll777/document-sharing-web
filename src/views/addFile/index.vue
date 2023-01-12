@@ -12,12 +12,15 @@
       <el-col :span="12"  style="margin-left: 30px">
         <div class="upload-panel">
           <el-upload
-              class="upload-demo"
               ref="upload"
-              :http-request="uploadData"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :file-list="addForm.fileList"
+              class="upload-demo"
+              :action="actionUrl"
+              :before-upload="beforeUpload"
+              :data="addForm"
+              :headers="headerObj"
+              :on-success="uploadSuccess"
+              :on-error="uploadError"
+              :file-list="fileList"
               :auto-upload="false"
               :limit="1"
               accept=".xls,.xlsx,.doc,.docx,.pdf,.ppt,.pptx">
@@ -28,6 +31,24 @@
               <p>支持Word/Excel/PPT/PDF，不超过100M</p>
             </div>
           </el-upload>
+<!--          <el-upload-->
+<!--              class="upload-demo"-->
+<!--              ref="upload"-->
+<!--              :http-request="uploadData"-->
+<!--              :on-preview="handlePreview"-->
+<!--              :on-remove="handleRemove"-->
+<!--              :file-list="addForm"-->
+<!--              :auto-upload="false"-->
+<!--              :limit="1"-->
+<!--              :data="this.addForm"-->
+<!--              accept=".xls,.xlsx,.doc,.docx,.pdf,.ppt,.pptx">-->
+<!--            <div style="padding: 5px; line-height: 45px;">-->
+<!--              <img :src="buttonSrc" width="68px" height="68px"/>-->
+<!--            </div>-->
+<!--            <div slot="tip" class="el-upload__tip">-->
+<!--              <p>支持Word/Excel/PPT/PDF，不超过100M</p>-->
+<!--            </div>-->
+<!--          </el-upload>-->
         </div>
       </el-col>
     </el-row>
@@ -44,8 +65,8 @@
         </el-form-item>
       </el-col>
     </el-row>
-
-      <el-col :span="6">
+      <el-row style="padding: 5px 0; margin-top: 30px">
+      <el-col :span="4">
         <el-form-item label="分类" prop="categoryId">
           <el-select v-model="addForm.categoryId" clearable placeholder="请选择分类">
             <el-option
@@ -55,25 +76,30 @@
                 :value="item.id">
             </el-option>
           </el-select>
-        &nbsp;<el-button size="mini" type="primary"  @click="handleOpenAddCategoryDraw">新增</el-button>
         </el-form-item>
       </el-col>
-
-        <div class="upload-button" style="width: 180px; height: 45px; border: 2px solid #000;
+        <el-col :span="4">
+        <el-button size="mini" type="primary"   @click="handleOpenAddCategoryDraw" style="margin: 5px">新增</el-button>
+        </el-col>
+        </el-row>
+      <el-row style="padding: 5px 0; margin-top: 30px; margin-left: 40px">
+        <el-col :span="20" >
+          <div class="upload-button" style="width: 180px; height: 45px; border: 2px solid #000;
                                     background: #FFF7D6;
 box-shadow: 0px 0px 10px 0px rgba(129,100,0,0.3);
 border-radius: 8px;
 display: flex;
 justify-content: center;
 "
-             @click="saveData">
-          <div style="padding: 5px; line-height: 45px;">
-            <img :src="buttonSrc" width="24px" height="28px"/>
+               @click="uploadFile">
+            <div style="padding: 5px; line-height: 45px;">
+              <img :src="buttonSrc" width="24px" height="28px"/>
+            </div>
+            <span
+                style="line-height: 45px; color: #000; font-size: 16px; font-weight: 600;">点我上传文档</span>
           </div>
-          <span
-              style="line-height: 45px; color: #000; font-size: 16px; font-weight: 600;">点我上传文档</span>
-
-        </div>
+        </el-col>
+      </el-row>
 
     </el-form>
     <!-- 添加分类抽屉 -->
@@ -104,6 +130,10 @@ justify-content: center;
 
 <script>
 
+import {addCategory, getCategoryList} from "@/api/category";
+import {getBaseUrl} from "@/utils/request";
+import {getToken} from "@/utils/auth";
+
 export default {
   name: "DocUpload",
   data() {
@@ -111,15 +141,15 @@ export default {
       placeholder: "输入一些内容",
       buttonSrc: require("../../assets/source/folder.png"),
       addForm:{
-        fileList:[],
         categoryId:"",
         description : ""
       },
+      fileList: [],
       //提交文件列表(只用来展示)
-
+      actionUrl: getBaseUrl() + "/files/uploadWithForm",
       //存放上传文件的对象
       headerObj: {
-        Authorization: localStorage.getItem("token")
+        Authorization: getToken()
       },
       categories: [],
       drawOptions: {
@@ -158,68 +188,57 @@ export default {
       this.$refs.addCategoryForm.validate((valid) => {
         if (valid) {
           this.drawOptions.addTagBtnLoading = true
-          var params = { 'name': this.addCategoryForm.name, 'description': this.addCategoryForm.description,userId :localStorage.getItem("id")}
-          CategoryRequest.addCategory(params).then(
-              response => {
-                if (response.code === 200) {
-                  this.$message.success(response.data)
-                  this.fetchCategoryData()
-                  this.addCategoryForm = {}
-                } else {
-                  this.$Message.info("错误：" + response.message)
-                }
-              }
-          )
+          var params = { 'name': this.addCategoryForm.name, 'description': this.addCategoryForm.description}
+          addCategory(params).then(response => {
+            if (response.code === 200) {
+              this.$message.success(response.data)
+             this.fetchCategoryData()
+              this.addForm = {}
+            } else {
+              this.$message.info("错误：" + response.message)
+            }
+            this.currentChangePage(this.currentPage)
+
+          })
           this.drawOptions.addTagBtnLoading = false
+         this.drawOptions.addVisible = false
         }
       })
     },
     // 获取分类数据
     fetchCategoryData() {
-      var param = { 'pageNum': 1, 'pageSize': 1000 }
-      CategoryRequest.getCategoryList(param).then(
-          response => {
-            if (response.code === 200) {
-              this.categories = response.data
-            } else {
-              this.$Message.info("错误：" + response.message)
-            }
-          }
-      )
-    },
-    uploadData(item){
-      console.log("uploadData")
-      console.log("categories",this.addForm)
-      //存放文件对象
-      var uploadFile = item.file;
-      // var param = { 'file': uploadFile, 'categoryId': this.addForm.categoryId,"description":this.addForm.description }
-      var param = { 'file': uploadFile }
-      console.log("param",param)
-      // const loading  = this.$loading({
-      //   lock:true,
-      //   text:"上传中...",
-      //   spinner:"el-icon-loading",
-      //   background:'#aaaaaa50'
-      // });
-      // var config = {
-      //   headers: { 'Content-Type': 'multipart/form-data' }
-      // };
-      // FilesRequest.uploadFile(param).then(
-      //     response => {
-      //       if (response.code === 200) {
-      //         this.$Message.info( response.data)
-      //       } else {
-      //         this.$Message.info("错误：" + response.message)
-      //       }
-      //
-      //     }
-      // )
+      getCategoryList(1,1000).then(response => {
+        if (response.code === 200) {
+          this.categories = response.data
+        } else {
+          this.$message.info("错误：" + response.message)
+        }
 
+      })
+    },
+    beforeUpload(){
+    },
+    uploadFile() {
+      if(this.headerObj.Authorization === undefined) {
+        this.$message.warning("您未登陆，请先登陆");
+        this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      } else {
+        this.$refs.upload.submit();
+      }
 
     },
-    saveData() {
-      this.$refs.upload.submit();
-    }, handleRemove(file, fileList) {
+    uploadSuccess() {
+      this.$message.success("上传文档成功");
+      this.dialogVisible = false;
+      this.fileList = []
+    },
+    uploadError() {
+      this.$message.error("上传文档失败");
+    },
+    // saveData() {
+    //   this.$refs.upload.submit();
+    // },
+    handleRemove(file, fileList) {
       console.log(file, fileList);
     },
     handlePreview(file) {

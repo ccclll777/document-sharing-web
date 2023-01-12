@@ -81,9 +81,21 @@ export const constantRoutes = [
       meta: { title: '首页', icon: 'home' }
     }]
   },
-
   {
-    path: '/blog/trend',
+    path: '/file/recommend',
+    component: Layout,
+    meta: { title: '文档收录', icon: 'blog' },
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/categoryRecommend/index'),
+        name: 'Blog2',
+        meta: { title: '分类推荐', icon: 'recommend' }
+      }
+    ]
+  },
+  {
+    path: '/file/trend',
     component: Layout,
     meta: { title: '文档收录', icon: 'blog' },
     children: [
@@ -95,21 +107,6 @@ export const constantRoutes = [
       }
     ]
   },
-
-  // {
-  //   path: '/blog/recommend',
-  //   component: Layout,
-  //   meta: { title: '文档收录', icon: 'blog' },
-  //   children: [
-  //     {
-  //       path: '',
-  //       component: () => import('@/views/blogRecommend/index'),
-  //       name: 'Blog2',
-  //       meta: { title: '个性推荐', icon: 'recommend' }
-  //     }
-  //   ]
-  // },
-
   // {
   //   path: '/blog/tag',
   //   component: Layout,
@@ -139,7 +136,7 @@ export const constantRoutes = [
   // },
 
   {
-    path: '/blog/search',
+    path: '/file/search',
     component: Layout,
     meta: { title: '文档收录', icon: 'blog' },
     children: [
@@ -160,9 +157,9 @@ export const constantRoutes = [
     meta: { title: '用户服务', icon: 'user' },
     children: [
       {
-        path: 'userDocs',
-        component: () => import('@/views/userDocs/index'),
-        name: 'userDocs',
+        path: 'userFiles',
+        component: () => import('@/views/userFiles/index'),
+        name: 'userFiles',
         meta: { title: '我的文档', icon: 'writer' }
       }
     ]

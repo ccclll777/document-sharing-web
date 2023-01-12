@@ -18,6 +18,7 @@
 import FileTag from "@/views/dashboard/FileTag";
 import { getBaseUrl } from '@/utils/request'
 
+
 export default {
     name: "FileThumb",
     components: {
