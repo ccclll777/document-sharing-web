@@ -115,13 +115,7 @@ export default {
       })
     },
     confirmEdit() {
-      var that = this
-      adminUpdateBlog(that.fileInfo.id, that.fileInfo).then(response => {
-        that.dialogFormVisible = false
-        that.handleCurrentChange()
-      }).catch(error => {
-        console.log(error)
-      })
+
     },
     confirmDel() {
       deleteFileCompletely(this.fileInfo.id).then(response => {

@@ -25,13 +25,6 @@
         <el-form-item label="用户名"><el-input v-model="registerForm.username" placeholder="请输入用户名：如hello" type="text" /></el-form-item>
         <el-form-item label="邮箱"><el-input v-model="registerForm.email" placeholder="请输入邮箱：如xx@xx.xx" type="text" /></el-form-item>
         <el-form-item label="密码"><el-input v-model="registerForm.password" type="password" placeholder="请输入密码" /></el-form-item>
-        <el-form-item label="标签偏好">
-          <el-checkbox-group v-model="tagCheck" size="small">
-            <span v-for="(item,index) in tagList" :key="index" style="margin: 4px">
-              <el-checkbox v-if="item.name!=='未知标签'" :label="item.id + '-' + item.name" border />
-            </span>
-          </el-checkbox-group>
-        </el-form-item>
         <el-form-item>
           <div style="float: right">
             <el-button @click="registerVis = false">返回</el-button>
@@ -45,7 +38,6 @@
 
 <script>
 import { register } from '@/api/user'
-import { addSubscription, getTagListByCount } from '@/api/blog'
 export default {
   name: 'Login',
   data() {
@@ -69,11 +61,6 @@ export default {
     }
   },
   created() {
-    var that = this
-    getTagListByCount(1, 10).then(response => {
-      const { data } = response
-      that.tagList = data
-    })
   },
   methods: {
     showPwd() {
@@ -109,9 +96,6 @@ export default {
           that.registerForm = {}
           that.$store.dispatch('user/login', this.loginForm).then(() => {
             that.$router.push({ path: this.redirect || '/' })
-            for (var i in that.tagCheck) {
-              addSubscription(1, that.tagCheck[i].split('-')[0])
-            }
             that.loading = false
           }).catch(() => {
             that.loading = false
